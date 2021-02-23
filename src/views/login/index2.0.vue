@@ -40,11 +40,12 @@
     </div>
 </template>
 <script>
-import { reactive,ref,onMounted } from '@vue/composition-api';
 import { stripscript,validateEmail,validatePass,validateVCode } from '@/utils/validate.js';
 export default {
-     setup(props, {refs}) {
-     let validateUsername = (rule, value, callback) => {
+    name: "login",
+    components: {},
+    data() {
+      var validateUsername = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入用户名'));
         } else if(!validateEmail(value)){
@@ -52,10 +53,10 @@ export default {
         }else{
           callback();
         }
-      }
-    let validatePassword = (rule, value, callback) => {
-          ruleForm.password = stripscript(value);
-          value = ruleForm.password;
+      };
+      var validatePassword = (rule, value, callback) => {
+          this.ruleForm.password = stripscript(value);
+          value = this.ruleForm.password;
         if (value === '') {
           callback(new Error('请输入密码'));
         } else if (!validatePass(value)) {
@@ -63,13 +64,13 @@ export default {
         } else {
           callback();
         }
-      }
-    let validatePasswords = (rule, value, callback) => {
+      };
+        var validatePasswords = (rule, value, callback) => {
             debugger;
-          if(vmodel.value === 'login'){
+          if(this.vmodel === 'login'){
               callback();
           }
-          if(value !== ruleForm.password){
+          if(value !== this.ruleForm.password){
               callback(new Error('两次输入的密码不一致'));
           }
         if (value === '') {
@@ -77,10 +78,10 @@ export default {
         } else {
           callback();
         }
-      }
-    let checkCode = (rule, value, callback) => {
-          ruleForm.code = stripscript(value);
-          value = ruleForm.code;
+      };
+      var checkCode = (rule, value, callback) => {
+          this.ruleForm.code = stripscript(value);
+          value = this.ruleForm.code;
         if (!value) {
           return callback(new Error('验证码不能为空'));
         }else if(!validateVCode(value)){
@@ -88,19 +89,22 @@ export default {
         }else{
             callback();
         }
-    }
-
-           const menuTab = reactive([
+        
+      };
+        return {
+           menuTab:
+           [
                {text:"登录",current:true,type:'login'},
                {text:"注册",current:false,type:'register'}
-           ])
-        const ruleForm = reactive({
+           ],
+           
+           ruleForm: {
                 username: '',
                 password: '',
                 passwords:'',
                 code: ''
-           })
-        const rules = reactive({
+           },
+                rules: {
                 username: [
                     { validator: validateUsername, trigger: 'blur' }
                 ],
@@ -113,21 +117,27 @@ export default {
                 code: [
                     { validator: checkCode, trigger: 'blur' }
                 ]
-           })
-        const vmodel= ref('login')
-
-        const toggleMenuTab = function(data){
-            menuTab.forEach(elem => {
-                elem.current = false;
-            })
-            data.current = true
-            vmodel.value = data.type
+           },
+            vmodel: 'login'
         }
-        /*
-          箭头函数写法
-        */
-        const submitForm = (formName => {
-            refs[formName].validate((valid) => {
+    },
+    created() {
+        
+    },
+    mounted() {
+        
+    },
+    methods: {
+        toggleMenuTab:function(data){
+            this.menuTab.forEach(elem => {
+                elem.current = false;
+            });
+            data.current = true
+            this.vmodel=data.type
+        },
+         submitForm(formName) {
+
+            this.$refs[formName].validate((valid) => {
             if (valid) {
                 alert('submit!');
             } else {
@@ -135,25 +145,12 @@ export default {
                 return false;
             }
             });
-         })
-
-
-    onMounted(()=> {
-        
-    })
-
-    return{
-        menuTab,
-        ruleForm,
-        rules,
-        vmodel,
-        toggleMenuTab,
-        submitForm
-      }  
-        
-    }
-
-   }
+         }
+      },
+    
+    props:{},
+    watch:{}
+}
 </script>
 <style lang="scss" scoped>
    #login{
